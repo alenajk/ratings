@@ -2,10 +2,10 @@
 
 from jinja2 import StrictUndefined
 
-from flask import Flask
+from flask import Flask, render_template, redirect, request, flash, session
 from flask_debugtoolbar import DebugToolbarExtension
 
-from model import connect_to_db, db
+from model import User, Rating, Movie, connect_to_db, db
 
 
 app = Flask(__name__)
@@ -22,8 +22,34 @@ app.jinja_env.undefined = StrictUndefined
 def index():
     """Homepage."""
 
-    return "<html><body>Placeholder for the homepage.</body></html>"
+    # check to see if anything in session
+    # if so , display "logged in" 
 
+    return render_template("homepage.html")
+
+@app.route('/login')
+def login():
+
+    # check to see if something in session:
+    # if so, render_template(homepage) OR display "You're already logged in - link to homepage or link to sign out"
+    # if not, render (loginform) 
+    return render_template("login_form.html")
+
+
+# @app.route('/login_process' methods="POST")
+# def login_process():
+
+#     form.request(username,password)
+#     add to session
+#     return render_template("homepage.html", insession=insession)
+
+
+@app.route('/users')
+def user_list():
+    """Show list of users."""
+
+    users = User.query.all()
+    return render_template("user_list.html", users=users)
 
 if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the point
