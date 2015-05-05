@@ -32,7 +32,7 @@ def load_movies():
     for line in movie_data:
         line_list = line.split('|')
         movie_id = line_list[0]
-        title = line_list[1][:line_list[1].rfind("(")]
+        title = line_list[1][:line_list[1].rfind(" (")]
         released_at = line_list[2]
         if line_list[2] != "":
             stripped_time = datetime.datetime.strptime(released_at, "%d-%b-%Y")
