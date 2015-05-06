@@ -46,17 +46,21 @@ def login():
         #alternate query syntax: 
         # pw_in_db = db.session.query(User).filter_by(email=email).one().password
 
-        pw_in_db = User.query.filter_by(email=email).one().password
-        
-        if password == pw_in_db:
-            session["email"] = email
-            session["password"] = password
+        pw_in_db = User.query.filter_by(email=email).all()
 
-            flash("You were successfully logged in!")
-            return redirect("/")
+        if pw_in_db == []:
+            flash("This email is not registered - please create an account.")
+            return redirect("/registration")
         else:
-            flash("wrong!")
-            return redirect("/login")
+            if pw_in_db[0].password == password:
+                session["email"] = email
+                session["password"] = password
+
+                flash("You were successfully logged in!")
+                return redirect("/")
+            else:
+                flash("wrong!")
+                return redirect("/login")
 
     return render_template("login_form.html")
 

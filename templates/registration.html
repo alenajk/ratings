@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Registration</h1>
+
+<form action="/registration" method="POST">
+    <p><label>Email:</label>
+    <input type="text" name="email" id="email">
+    </p>
+    <p>
+    <label>Create a Password:</label>
+    <input type="text" name="password" id="password">
+    </p>
+    <p>
+    <label>Your Age</label>
+    <input type="text" name="age" id="age">
+    </p>
+    <p>
+    <label>Your Zip Code</label>
+    <input type="text" name="zipcode" id="zipcode">
+    </p>
+    <input type="submit" value="Submit">
+
+
+</form>
+<script>
+    // add check to see if all fields filled in
+</script>
+
+{% endblock %}
