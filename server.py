@@ -121,7 +121,7 @@ def show_user_page(user_id):
         movie_id = user_rating.movie_id
         title = Movie.query.filter_by(movie_id=movie_id)[0].title
         titles_and_scores[title] = user_rating.score
-
+    print titles_and_scores
     return render_template("user_profile.html", user=user, titles_and_scores=titles_and_scores)
 
 @app.route('/movies')
@@ -163,17 +163,17 @@ def add_rating(movie_id):
     #check to see if Rating exists in db for which user_id and movie_id match
     #If there's already a rating in the db, update (??) the record
     #If not, add the rating.
-    rating_record = Rating.query.filter_by(email=email,movie_id=movie_id).all()
+    rating_record = Rating.query.filter_by(user_id=user_id,movie_id=movie_id).all()
 
     if rating_record == []:
 
         # insert new rating into rating table based on user id
         new_rating_record = Rating(movie_id=movie_id, user_id=user_id, score=score)
-        print "EEEEEEEEEEEEEEEE", new_rating_record
-        # db.session.add(new_rating_record)
-        # db.session.commit()
+        db.session.add(new_rating_record)
+        db.session.commit()
     else:
-        rating_record.score = score
+        print rating_record
+        rating_record[0].score = score
         db.session.commit()
 
     return "You rated " + str(movie_id) + str(score) +str(email) +str(user_id)

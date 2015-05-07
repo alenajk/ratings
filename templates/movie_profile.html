@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block content %}
+
+
+    <h2>{{ title }}</h2>
+    <ul>
+        <li><strong>Ratings:</strong> {{ movie_ratings }}</li>
+        <li><strong>Release Date:</strong> {{ released }}</li>
+        <li><strong>IMDB Page: </strong><a href="{{ imdb }}">{{ title }}</a></li>
+    </ul>
+    
+    {% if loggedin %}
+
+        <form action="/new_rating/{{ movie_id }}" method="POST">
+            Rate this movie:<br>
+            <input type="radio" name="score" value="5">5 Stars<br>
+            <input type="radio" name="score" value="4">4 Stars<br>
+            <input type="radio" name="score" value="3">3 Stars<br>
+            <input type="radio" name="score" value="2">2 Stars<br>
+            <input type="radio" name="score" value="1">1 Stars<br>
+        <input type="submit" value="Submit">
+        </form>
+
+    {% endif %}
+
+{% endblock %}
