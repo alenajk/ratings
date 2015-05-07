@@ -52,8 +52,8 @@ def load_ratings():
 
     for line in rating_data:
         line_list = line.rstrip().split("\t")
-        movie_id = line_list[0]
-        user_id = line_list[1]
+        user_id = line_list[0]
+        movie_id = line_list[1]
         score = line_list[2]
         current_line = Rating(movie_id=movie_id, user_id=user_id, score=score)
         db.session.add(current_line)
