@@ -27,7 +27,7 @@ class User(db.Model):
         return "<User user_id=%s email=%s password=%s>" % (self.user_id, self.email, self.password)
 
 
-    def make_pairs(self, other):
+    def assess_similarity(self, other):
         # user1 and user2 are user objects
         # make an empty dictionary to hold user1's ratings and an empty list
         # for pairs of scores for movies shared by user1 and user2 
@@ -58,6 +58,37 @@ class User(db.Model):
 
         else:
             return 0.0
+
+    def predict_rating(self, movie):
+        """Predict a user's rating of a movie."""
+        # Parameter movie is a movie object
+        # Create list of rating objects for movie:
+        other_ratings = movie.ratings
+        # Iterate over list of rating objects and putting each user object into a list
+        other_users = [r.user for r in other_ratings]
+
+        # Iterate through list of user objects, find similarity coefficient, 
+        # add the coefficient and other_user user object into a list as tuples
+        similarities = [ 
+            (self.assess_similarity(other_user), other_user)
+            for other_user in other_users
+        ]
+
+        similarities.sort(reverse=True)
+        sim, best_match_user = similarities[0]
+
+        matched_rating = None
+        for rating in other_ratings:
+            if rating.user_id == best_match_user.user_id:
+                return rating.score * sim
+
+        
+
+
+
+
+
+
 
 class Movie(db.Model):
 
