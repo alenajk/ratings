@@ -2,26 +2,29 @@
 <html>
 <head>
   <title>Ratings</title>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
 
 </head>
 
 <body>
-  Ratings
+  <div class="container-fluid">
+    {% include 'navbar.html' %}
+    <div>
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <ul class=flashes>
+                {% for message in messages %}
+                    <li> {{ message }} </li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
 
-  <hr>
 
-    {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            <ul class=flashes>
-            {% for message in messages %}
-                <li> {{ message }} </li>
-            {% endfor %}
-            </ul>
-        {% endif %}
-    {% endwith %}
+      {% block content %} put your content here {% endblock %}
+      </div>
 
-
-  {% block content %} put your content here {% endblock %}
-
+    </div>
+  </div>
 </body>
 </html>

@@ -92,14 +92,14 @@ def register():
 
     return render_template("registration.html")
 
-@app.route('/logout')
+@app.route('/logout', methods=["GET"])
 def logout():
+    print "LOGGED OUT"
     session["email"] = ""
     session["password"] = ""
 
     flash("Logged you out!")
-    return render_template("homepage.html")
-
+    return redirect("/")
 
 @app.route('/users')
 def user_list():
@@ -136,7 +136,7 @@ def show_movie_page(movie_id):
     
     loggedin = False
 
-    if session["email"] != "":
+    if session.get("email"):
         loggedin = True
 
     movie = Movie.query.filter_by(movie_id=movie_id).one()

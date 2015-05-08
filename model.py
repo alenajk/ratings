@@ -1,6 +1,7 @@
 """Models and database functions for Ratings project."""
 
 from flask_sqlalchemy import SQLAlchemy
+import correlation
 
 # This is the connection to the SQLite database; we're getting this through
 # the Flask-SQLAlchemy helper library. On this, we can find the `session`
@@ -24,6 +25,39 @@ class User(db.Model):
     def __repr__(self):
 
         return "<User user_id=%s email=%s password=%s>" % (self.user_id, self.email, self.password)
+
+
+    def make_pairs(self, other):
+        # user1 and user2 are user objects
+        # make an empty dictionary to hold user1's ratings and an empty list
+        # for pairs of scores for movies shared by user1 and user2 
+        user_ratings_dict = {}
+        paired_ratings = []
+
+        # Iterate over the list of rating objects for user1 - ie. all ratings
+        # user1 has done, add to dictionary: KEY: movie_id, VALUE: rating object 
+        for r in self.ratings:
+            user_ratings_dict[r.movie_id] = r
+
+        # Iterate over the list of rating objects for user2
+        # Checking to see if movie_id for that rating object is in our 
+        # dictionary for user1's ratings - ie. checking if user1 rated
+        # that movie. Assigning User1's rating object to the variable
+        # u_rating for that movie
+        for other_rating in other.ratings:
+            u_rating = user_ratings_dict.get(other_rating.movie_id)
+            # If user1 has not rated that movie, skip. Otherwise...
+            if u_rating is not None:
+                # Assign a tuple of the two users' scores to variable "pair",
+                # and append tuple to "pairings" list.   
+                pair = (u_rating.score, other_rating.score)
+                paired_ratings.append(pair)
+
+        if paired_ratings:
+            return correlation.pearson(paired_ratings)
+
+        else:
+            return 0.0
 
 class Movie(db.Model):
 
