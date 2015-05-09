@@ -133,25 +133,98 @@ def movie_list():
 
 @app.route('/movies/<int:movie_id>')
 def show_movie_page(movie_id):
-    
-    loggedin = False
+    """Show details about a movie. Allow a user to add or update a rating
+    if they are logged in."""
 
+    loggedin = False
+    # Get movie object for given movie, assign to variable "movie"    
+    movie = Movie.query.filter_by(movie_id=movie_id).one()
+
+    # Check to see if user is logged in. Get user_id for that user if so.
     if session.get("email"):
         loggedin = True
+        user_id = User.query.filter_by(email=session["email"]).one().user_id
+        # Return rating object for user & movie, or None if user has not rated movie.
+        user_rating = Rating.query.filter_by(
+            movie_id = movie_id, user_id=user_id).first()
+    # If not logged in, set user_rating to None
+    else:
+        user_rating = None
 
-    movie = Movie.query.filter_by(movie_id=movie_id).one()
+    # Get average rating of a movie
+    rating_scores = [r.score for r in movie.ratings]    
+    avg_rating = round(float(sum(rating_scores)) / len(rating_scores), 2)
+
+    # Prediction code: will only predict if user has not rated movie.
+    prediction = None
+
+    if (not user_rating) and loggedin:
+        print "\n\nHGERE\n\n"
+        user = User.query.get(user_id)
+        prediction = user.predict_rating(movie)
+
     mov_ratings = movie.ratings
     movie_ratings =[]
 
     for each_rating in mov_ratings:
         movie_ratings.append(each_rating.score)
  
+    if prediction:
+        # If user hasn't rated this movie
+        effective_rating = prediction
+        prediction = int(round(prediction))
+
+    elif user_rating:
+        # If the user has rated this movie
+        effective_rating = user_rating.score
+
+    else:
+        # User hasn't rated this movie, and we couldn't get a prediction
+        effective_rating = None
+
+    # Get evil bunny's rating, either by predicting it or using bunny's real rating 
+
+    # Getting bunny's user object
+    evil_bunny = User.query.filter_by(email="bunny@gmail.com").one()
+    bunny_rating = Rating.query.filter_by(
+        user_id=evil_bunny.user_id, movie_id=movie.movie_id).first()
+
+    # If bunny hasn't rated the movie yet, set bunny_rating to the output of the
+    # predict_rating function - called with evil_bunny object.
+    if bunny_rating is None:
+        bunny_rating = evil_bunny.predict_rating(movie)
+    # If bunny has rated the movie, use bunny's actual rating for bunny_rating
+    else:
+        bunny_rating = bunny_rating.score
+
+    if bunny_rating and effective_rating:
+        difference = abs(bunny_rating - effective_rating)
+
+    else:
+        # We couldn't get a bunny rating
+        difference = None
+
+    BERATEMENT_MESSAGES = [
+        "You have ok taste.",
+        "Ugh.",
+        "You have disappointed bunny very much.",
+        "You have enraged me with your taste in cinema.",
+        "I. Can't. Even. Please get help."
+        ]
+
+    if difference is not None:
+        beratement = BERATEMENT_MESSAGES[int(difference)]
+    else:
+        beratement = None
+
     title = movie.title
     released = movie.released_at.strftime("%B %d, %Y")
     imdb = movie.imdb_url
     movie_id = movie.movie_id
 
-    return render_template("movie_profile.html", movie_id=movie_id, title = title, movie_ratings=movie_ratings, released=released, imdb=imdb, loggedin=loggedin)
+    return render_template("movie_profile.html", movie_id=movie_id, title = title, 
+        movie_ratings=movie_ratings, released=released, imdb=imdb, loggedin=loggedin, 
+        user_rating=user_rating, average=avg_rating, prediction=prediction, beratement=beratement)
 
 @app.route('/new_rating/<int:movie_id>', methods = ['GET', 'POST'])
 def add_rating(movie_id):

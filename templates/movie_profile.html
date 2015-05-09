@@ -11,8 +11,23 @@
     
     {% if loggedin %}
 
+    {% if user_rating %}    
+    <p>Your rating: {{ user_rating.score }}</p>
+    
+    {% endif %}
+    {% if beratement %}
+    {{ beratement }}
+    {% endif %}<br>
+    <p>Average rating: {{ average }}</p>
+        {% if prediction %}
+            <p>We predict you will rate this movie {{ prediction }}.</p>
+        {% endif %}
+
         <form action="/new_rating/{{ movie_id }}" method="POST">
-            Rate this movie:<br>
+            {% if user_rating %} Update your rating:
+            {% else %}
+            Rate this movie:
+            {% endif %}<br>
             <input type="radio" name="score" value="5">5 Stars<br>
             <input type="radio" name="score" value="4">4 Stars<br>
             <input type="radio" name="score" value="3">3 Stars<br>

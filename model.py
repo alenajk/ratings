@@ -64,25 +64,27 @@ class User(db.Model):
         # Parameter movie is a movie object
         # Create list of rating objects for movie:
         other_ratings = movie.ratings
-        # Iterate over list of rating objects and putting each user object into a list
-        other_users = [r.user for r in other_ratings]
 
-        # Iterate through list of user objects, find similarity coefficient, 
-        # add the coefficient and other_user user object into a list as tuples
+        # Iterate through list of rating objects, find similarity coefficient for 
+        # self and that user, add the coefficient and rating object of other user
+        # as a tuple into similarities list.
         similarities = [ 
-            (self.assess_similarity(other_user), other_user)
-            for other_user in other_users
+            (self.assess_similarity(other_rating.user), other_rating)
+            for other_rating in other_ratings
         ]
 
         similarities.sort(reverse=True)
-        sim, best_match_user = similarities[0]
-
-        matched_rating = None
-        for rating in other_ratings:
-            if rating.user_id == best_match_user.user_id:
-                return rating.score * sim
-
         
+        similarities = [(sim, r) for sim, r in similarities if sim > 0]
+        if not similarities:
+            return None
+
+        numerator = sum([r.score * sim for sim, r in similarities])
+        denominator = sum([sim for sim, r in similarities])
+
+        return numerator/denominator
+
+
 
 
 
